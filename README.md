@@ -10,6 +10,7 @@
 </p>
 
 
+
 ## Installation
 
 ```bash
@@ -50,3 +51,4 @@ Build() // build the client
 
 ## Making HTTP calls
 Take a look at all of the [examples folder](./examples/) for more information on how to make http calls
+
