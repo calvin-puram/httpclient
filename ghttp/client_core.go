@@ -4,10 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/calvin-puram/httpclient/config"
 )
 
 const (
@@ -20,9 +23,9 @@ func (c *client) setBody(contentType string, body interface{}) ([]byte, error) {
 		return nil, nil
 	}
 	switch strings.ToLower(contentType) {
-	case "application/json":
+	case config.ContentTypeJSON:
 		return json.Marshal(body)
-	case "application/xml":
+	case config.ContentTypeXML:
 		return xml.Marshal(body)
 	default:
 		return json.Marshal(body)
@@ -31,13 +34,14 @@ func (c *client) setBody(contentType string, body interface{}) ([]byte, error) {
 
 func (c *client) do(method, url string, headers http.Header, body interface{}) (*Response, error) {
 	fullHeaders := c.httpHeaders(headers)
-	postData, err := c.setBody(fullHeaders.Get("Content-Type"), body)
+
+	postData, err := c.setBody(fullHeaders.Get(config.HeaderContentType), body)
 	if err != nil {
 		return nil, err
 	}
-
+	fmt.Println(string(postData))
 	if mock := mockedserver.getMock(method, url, string(postData)); mock != nil {
-    return mock.GetResBody()
+		return mock.GetResBody()
 	}
 
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(postData))
@@ -60,34 +64,21 @@ func (c *client) do(method, url string, headers http.Header, body interface{}) (
 		return nil, err
 	}
 	return &Response{
-		status: res.Status,
+		status:     res.Status,
 		statusCode: res.StatusCode,
-		header: res.Header,
-		body: data,
+		header:     res.Header,
+		body:       data,
 	}, nil
 
-
-}
-
-func (c *client) httpHeaders(headers http.Header) http.Header {
-	req := make(http.Header)
-	// common httpHeaders
-	for ky, vl := range c.builder.headers {
-		if len(vl) > 0 {
-			req.Add(ky, vl[0])
-		}
-	}
-	//unique headers
-	for ky, vl := range headers {
-		if len(vl) > 0 {
-			req.Add(ky, vl[0])
-		}
-	}
-	return req
 }
 
 func (c *client) getHttpClient() *http.Client {
 	c.clientOnce.Do(func() {
+		if c.builder.cl != nil {
+			c.client = c.builder.cl
+			return
+		}
+
 		c.client = &http.Client{
 			Timeout: c.builder.ResponseHeaderTimeout,
 			Transport: &http.Transport{

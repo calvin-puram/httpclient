@@ -1,27 +1,28 @@
 package examples
 
-import "fmt"
+import (
+	"fmt"
 
-type githubRes struct{
-	Login string 	`json:"login"`
-	URL string `json:"url"`
-	Bio string `json:"bio,omitempty"`
+	"github.com/calvin-puram/httpclient/config"
+)
+
+type Todo struct {
+	Id    int    `json:"id"`
+	Title string `json:"title"`
+	Body  string `json:"body,omitempty"`
 }
 
-func GetGithubUser() (*string, error) {
-	 res, err := httpClient.Get("https://api.github.com/user", nil, nil)
+func getTodoById() (*Todo, error) {
+	res, err := httpClient.Get(fmt.Sprintf("%s/%d", config.BaseURL, 1), nil)
 
-	 if err != nil {
+	if err != nil {
 		return nil, err
-	 }
+	}
 
-	 fmt.Println("response status", res.Status())
-	 fmt.Println("response statuscode", res.StatusCode())
-	 fmt.Println("response body", res.BodyString())
-	 var userEndpoint githubRes
-	 if err := res.UnmarsalJSON(&userEndpoint); err != nil {
+	var todo Todo
+	if err := res.UnmarsalJSON(&todo); err != nil {
 		return nil, err
-	 }
+	}
 
-	 return &userEndpoint.URL, nil
+	return &todo, nil
 }

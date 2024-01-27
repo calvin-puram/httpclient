@@ -14,10 +14,10 @@ var (
 	}
 )
 
-type mockserver struct{
-	enable bool
+type mockserver struct {
+	enable      bool
 	servermutex sync.Mutex
-	mocks map[string]*Mock
+	mocks       map[string]*Mock
 }
 
 func StartMockServer() {
@@ -35,14 +35,14 @@ func StopMockServer() {
 func AddMock(mock Mock) {
 	mockedserver.servermutex.Lock()
 	defer mockedserver.servermutex.Unlock()
-  key := mockedserver.getMockKey(mock.Method, mock.URL, mock.RequestBody)
-	
+	key := mockedserver.getMockKey(mock.Method, mock.URL, mock.RequestBody)
+
 	mockedserver.mocks[key] = &mock
 }
 
-func (m *mockserver) cleanBody(body string) string{
+func (m *mockserver) cleanBody(body string) string {
 	nbody := strings.TrimSpace(body)
-	if nbody == ""{
+	if nbody == "" {
 		return ""
 	}
 
@@ -55,7 +55,7 @@ func (m *mockserver) getMockKey(method, url, body string) string {
 	hash := md5.New()
 	hash.Write([]byte(method + url + m.cleanBody(body)))
 	key := hex.EncodeToString(hash.Sum(nil))
-  return key
+	return key
 }
 
 func FlushMock() {
@@ -64,13 +64,13 @@ func FlushMock() {
 	mockedserver.mocks = make(map[string]*Mock)
 }
 
-func (m *mockserver) getMock(method, url, body string) *Mock{
+func (m *mockserver) getMock(method, url, body string) *Mock {
 	if !m.enable {
 		return nil
 	}
 
-	if mock := m.mocks[m.getMockKey(method, url, body)]; mock != nil{
-    return mock
+	if mock := m.mocks[m.getMockKey(method, url, body)]; mock != nil {
+		return mock
 	}
 
 	return &Mock{

@@ -6,10 +6,11 @@ import (
 )
 
 type Client interface {
-	Get(url string, headers http.Header, body interface{}) (*Response, error)
-	Post(url string, headers http.Header, body interface{}) (*Response, error)
-	Patch(url string, headers http.Header, body interface{}) (*Response, error)
-	Delete(url string, headers http.Header, body interface{}) (*Response, error)
+	Get(string, interface{}, ...http.Header) (*Response, error)
+	Post(string, interface{}, ...http.Header) (*Response, error)
+	Patch(string, interface{}, ...http.Header) (*Response, error)
+	Put(string, interface{}, ...http.Header) (*Response, error)
+	Delete(string, interface{}, ...http.Header) (*Response, error)
 }
 
 type client struct {
@@ -18,18 +19,23 @@ type client struct {
 	clientOnce sync.Once
 }
 
-func (c *client) Get(url string, headers http.Header, body interface{}) (*Response, error) {
-	return c.do(http.MethodGet, url, headers, nil)
+func (c *client) Get(url string, body interface{}, headers ...http.Header) (*Response, error) {
+
+	return c.do(http.MethodGet, url, setHttpHeaders(headers...), nil)
 }
 
-func (c *client) Post(url string, headers http.Header, body interface{}) (*Response, error) {
-	return c.do(http.MethodPost, url, headers, body)
+func (c *client) Post(url string, body interface{}, headers ...http.Header) (*Response, error) {
+	return c.do(http.MethodPost, url, setHttpHeaders(headers...), body)
 }
 
-func (c *client) Patch(url string, headers http.Header, body interface{}) (*Response, error) {
-	return c.do(http.MethodPatch, url, headers, body)
+func (c *client) Patch(url string, body interface{}, headers ...http.Header) (*Response, error) {
+	return c.do(http.MethodPatch, url, setHttpHeaders(headers...), body)
 }
 
-func (c *client) Delete(url string, headers http.Header, body interface{}) (*Response, error) {
-	return c.do(http.MethodDelete, url, headers, nil)
+func (c *client) Put(url string, body interface{}, headers ...http.Header) (*Response, error) {
+	return c.do(http.MethodPatch, url, setHttpHeaders(headers...), body)
+}
+
+func (c *client) Delete(url string, body interface{}, headers ...http.Header) (*Response, error) {
+	return c.do(http.MethodDelete, url, setHttpHeaders(headers...), nil)
 }

@@ -16,11 +16,11 @@ func (r Response) Status() string {
 	return r.status
 }
 
-func (r Response) StatusCode() int{
+func (r Response) StatusCode() int {
 	return r.statusCode
 }
 
-func (r Response) Header() http.Header{
+func (r Response) Header() http.Header {
 	return r.header
 }
 
@@ -28,10 +28,10 @@ func (r Response) Bytes() []byte {
 	return r.body
 }
 
-func (r Response) BodyString() string{
+func (r Response) BodyString() string {
 	return string(r.body)
 }
 
 func (r Response) UnmarsalJSON(target interface{}) error {
-  return json.Unmarshal(r.body, target)
+	return json.Unmarshal(r.body, target)
 }

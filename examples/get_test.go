@@ -2,11 +2,13 @@ package examples
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
 	"testing"
 
+	"github.com/calvin-puram/httpclient/config"
 	"github.com/calvin-puram/httpclient/ghttp"
 )
 
@@ -15,49 +17,46 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func TestGetGithubEndpoint(t *testing.T) {
-	t.Run("github enpoint return err", func(t *testing.T) {
+func TestGetTodo(t *testing.T) {
+
+	t.Run("GET Todo return an error", func(t *testing.T) {
 		ghttp.FlushMock()
-		//initialization
+
 		ghttp.AddMock(ghttp.Mock{
-			URL: "https://api.github.com/user",
+			URL:    fmt.Sprintf("%s/%d", config.BaseURL, 1),
 			Method: http.MethodGet,
-			Error: errors.New("request timeout"),
+			Error:  errors.New("request timeout"),
 		})
 
-		//execution
-		endpoint, err := GetGithubUser()
+		body, err := getTodoById()
 
-		//validation
-		if endpoint != nil {
-			t.Errorf("didn't expect an endpoint but got %v", endpoint)
+		if body != nil {
+			t.Errorf("didn't expect a body but got %v", body)
 		}
 
 		if err == nil {
 			t.Error("expect an error but got nil")
 		}
 
-		if err.Error() != "request timeout"{
+		if err.Error() != "request timeout" {
 			t.Errorf("expect `request timeout` but got %q", err.Error())
 		}
 	})
 
-	t.Run("marshal body err", func(t *testing.T) {
+	t.Run("GET Todo marshal body error", func(t *testing.T) {
 		ghttp.FlushMock()
-		//initialization
+
 		ghttp.AddMock(ghttp.Mock{
-			Method: http.MethodGet,
-			URL: "https://api.github.com/user",
-			ResponseBody: `{"url":123}`,
-      ResponseStatusCode: http.StatusOK,
+			Method:             http.MethodGet,
+			URL:                fmt.Sprintf("%s/%d", config.BaseURL, 1),
+			ResponseBody:       `{"id":1,"title":"test","body": 34}`,
+			ResponseStatusCode: http.StatusOK,
 		})
 
-		//execution
-		endpoint, err := GetGithubUser()
+		body, err := getTodoById()
 
-		//validation
-		if endpoint != nil {
-			t.Errorf("didn't expect an endpoint but got %v", endpoint)
+		if body != nil {
+			t.Errorf("didn't expect a body but got %v", body)
 		}
 
 		if err == nil {
@@ -69,30 +68,24 @@ func TestGetGithubEndpoint(t *testing.T) {
 		}
 	})
 
-	t.Run("response endpoint", func(t *testing.T) {
+	t.Run("GET Todo response body", func(t *testing.T) {
 		ghttp.FlushMock()
-		//initialization
+
 		ghttp.AddMock(ghttp.Mock{
-			Method: http.MethodGet,
-			URL: "https://api.github.com/user",
-			ResponseBody: `{"url":"https://api.github.com/users/blockops-engineering"}`,
-      ResponseStatusCode: http.StatusOK,
+			Method:             http.MethodGet,
+			URL:                fmt.Sprintf("%s/%d", config.BaseURL, 1),
+			ResponseBody:       `{"id":1,"title":"test","body":"todo body"}`,
+			ResponseStatusCode: http.StatusOK,
 		})
 
-		//execution
-		endpoint, err := GetGithubUser()
+		body, err := getTodoById()
 
-		//validation
 		if err != nil {
-			t.Errorf("didn't expect an error but go %v", err)
+			t.Errorf("didn't expect an error but go %v", err.Error())
 		}
 
-		if endpoint == nil {
-			t.Error("expected an endpoint but got nil")
-		}
-
-		if endpoint == nil {
-			t.Error("expected an endpoint but got nil")
+		if body == nil {
+			t.Error("expected an body but got nil")
 		}
 
 	})
