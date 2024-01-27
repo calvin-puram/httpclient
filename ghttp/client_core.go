@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"github.com/calvin-puram/httpclient/config"
+	"github.com/calvin-puram/httpclient/config/core"
+	"github.com/calvin-puram/httpclient/config/mocks"
 )
 
 const (
@@ -32,7 +34,7 @@ func (c *client) setBody(contentType string, body interface{}) ([]byte, error) {
 	}
 }
 
-func (c *client) do(method, url string, headers http.Header, body interface{}) (*Response, error) {
+func (c *client) do(method, url string, headers http.Header, body interface{}) (*core.Response, error) {
 	fullHeaders := c.httpHeaders(headers)
 
 	postData, err := c.setBody(fullHeaders.Get(config.HeaderContentType), body)
@@ -40,7 +42,7 @@ func (c *client) do(method, url string, headers http.Header, body interface{}) (
 		return nil, err
 	}
 	fmt.Println(string(postData))
-	if mock := mockedserver.getMock(method, url, string(postData)); mock != nil {
+	if mock := mocks.GetMock(method, url, string(postData)); mock != nil {
 		return mock.GetResBody()
 	}
 
@@ -63,11 +65,11 @@ func (c *client) do(method, url string, headers http.Header, body interface{}) (
 	if err != nil {
 		return nil, err
 	}
-	return &Response{
-		status:     res.Status,
-		statusCode: res.StatusCode,
-		header:     res.Header,
-		body:       data,
+	return &core.Response{
+		Status:     res.Status,
+		StatusCode: res.StatusCode,
+		Header:     res.Header,
+		Body:       data,
 	}, nil
 
 }
