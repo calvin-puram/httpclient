@@ -9,20 +9,20 @@ import (
 	"testing"
 
 	"github.com/calvin-puram/httpclient/config"
-	"github.com/calvin-puram/httpclient/ghttp"
+	"github.com/calvin-puram/httpclient/config/mocks"
 )
 
 func TestMain(m *testing.M) {
-	ghttp.StartMockServer()
+	mocks.StartMockServer()
 	os.Exit(m.Run())
 }
 
 func TestGetTodo(t *testing.T) {
 
 	t.Run("GET Todo return an error", func(t *testing.T) {
-		ghttp.FlushMock()
+		mocks.FlushMock()
 
-		ghttp.AddMock(ghttp.Mock{
+		mocks.AddMock(mocks.Mock{
 			URL:    fmt.Sprintf("%s/%d", config.BaseURL, 1),
 			Method: http.MethodGet,
 			Error:  errors.New("request timeout"),
@@ -44,9 +44,9 @@ func TestGetTodo(t *testing.T) {
 	})
 
 	t.Run("GET Todo marshal body error", func(t *testing.T) {
-		ghttp.FlushMock()
+		mocks.FlushMock()
 
-		ghttp.AddMock(ghttp.Mock{
+		mocks.AddMock(mocks.Mock{
 			Method:             http.MethodGet,
 			URL:                fmt.Sprintf("%s/%d", config.BaseURL, 1),
 			ResponseBody:       `{"id":1,"title":"test","body": 34}`,
@@ -69,9 +69,9 @@ func TestGetTodo(t *testing.T) {
 	})
 
 	t.Run("GET Todo response body", func(t *testing.T) {
-		ghttp.FlushMock()
+		mocks.FlushMock()
 
-		ghttp.AddMock(ghttp.Mock{
+		mocks.AddMock(mocks.Mock{
 			Method:             http.MethodGet,
 			URL:                fmt.Sprintf("%s/%d", config.BaseURL, 1),
 			ResponseBody:       `{"id":1,"title":"test","body":"todo body"}`,

@@ -6,15 +6,15 @@ import (
 	"testing"
 
 	"github.com/calvin-puram/httpclient/config"
-	"github.com/calvin-puram/httpclient/ghttp"
+	"github.com/calvin-puram/httpclient/config/mocks"
 )
 
 func TestCreateTodo(t *testing.T) {
 
 	t.Run("POST Todo check response error", func(t *testing.T) {
-		ghttp.FlushMock()
+		mocks.FlushMock()
 
-		ghttp.AddMock(ghttp.Mock{
+		mocks.AddMock(mocks.Mock{
 			URL:         config.BaseURL,
 			Method:      http.MethodPost,
 			RequestBody: `{"id":1,"title":"test todo","body":"clean code","userId":1}`,
@@ -38,9 +38,9 @@ func TestCreateTodo(t *testing.T) {
 	})
 
 	t.Run("POST Todo response body", func(t *testing.T) {
-		ghttp.FlushMock()
+		mocks.FlushMock()
 
-		ghttp.AddMock(ghttp.Mock{
+		mocks.AddMock(mocks.Mock{
 			Method:             http.MethodPost,
 			URL:                config.BaseURL,
 			RequestBody:        `{"id":1,"title":"test todo","body":"clean code","userId":1}`,

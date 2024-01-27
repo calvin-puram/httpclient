@@ -1,4 +1,4 @@
-package ghttp
+package mocks
 
 import (
 	"crypto/md5"
@@ -64,12 +64,12 @@ func FlushMock() {
 	mockedserver.mocks = make(map[string]*Mock)
 }
 
-func (m *mockserver) getMock(method, url, body string) *Mock {
-	if !m.enable {
+func GetMock(method, url, body string) *Mock {
+	if !mockedserver.enable {
 		return nil
 	}
 
-	if mock := m.mocks[m.getMockKey(method, url, body)]; mock != nil {
+	if mock := mockedserver.mocks[mockedserver.getMockKey(method, url, body)]; mock != nil {
 		return mock
 	}
 
