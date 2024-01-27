@@ -33,7 +33,16 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go }}
-          
+
+      - name: Format
+        run: diff -u <(echo -n) <(go fmt $(go list ./...))
+
+      - name: Test
+        run: go test ./... -race -coverprofile=coverage.txt -covermode=atomic
+
+      - name: Coverage
+        run: bash <(curl -s https://codecov.io/bash)
+
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
